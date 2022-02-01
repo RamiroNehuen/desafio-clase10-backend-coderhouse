@@ -1,9 +1,17 @@
 const express = require('express');
 const { Router } = express;
+const handlebars = require('express-handlebars');
 
 const app = express();
 const products = Router();
 const port = 8080;
+
+app.engine('hbs', handlebars({
+   extname: '.hbs',
+   defaultLayout: 'index.hbs',
+   layoutsDir: __dirname + '/views/layouts/',
+   partialsDir: __dirname + '/views/partials/'
+}))
 
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
@@ -73,8 +81,14 @@ products.delete('/:id', (req, res) => {
   };
  });
 
+app.set('view engine', 'hbs');
+app.set('views', './views');
+
 app.use('/products', products);
 app.use('/static', express.static('public'));
+
+app.set('view engine', 'hbs');
+app.set('views', './views');
 
 app.listen(port, () => {
    console.log(`Escuchando en esta uri http://localhost: ${port}`)
