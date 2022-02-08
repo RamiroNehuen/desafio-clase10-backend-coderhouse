@@ -1,28 +1,38 @@
 const express = require('express');
 const { Router } = express;
-const handlebars = require('express-handlebars');
+const { engine } = require('express-handlebars');
 
 const app = express();
 const products = Router();
 const port = 8080;
 
-app.engine('hbs', handlebars({
-   extname: '.hbs',
-   defaultLayout: 'index.hbs',
-   layoutsDir: __dirname + '/views/layouts/',
-   partialsDir: __dirname + '/views/partials/'
-}))
+app.engine(
+   'hbs', 
+   engine({
+      extname: '.hbs',
+      defaultLayout: 'index.hbs',
+      layoutsDir: __dirname + '/views/layouts/',
+      partialsDir: __dirname + '/views/partials'
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended:true }));
 
-const productsList = [];
+const productsList = [{
+   id: 'prueba',
+   product: 'prueba',
+   price: 'xxx',
+   img: 'https://cdn1.iconfinder.com/data/icons/space-flat-galaxy-radio/512/starship-256.png',
+}];
+
+const listShow = true;
+const formShow = true;
 
 
 products.get('/', (req, res) => {
    if(productsList.length === 0){
       res.send(` Aún no hay productos cargados`)
-   } else {res.send(productsList)}
+   } else {res.render('main', {productsList:productsList, listExist: listShow })}
    ;
 });
 
@@ -44,7 +54,7 @@ products.post('/', (req, res) => {
           idIndex = generateNewId();
       };
       return idIndex;
-  }
+   };
     const product = {
          id: generateNewId(),
          product: req.body.item,
@@ -52,7 +62,7 @@ products.post('/', (req, res) => {
          img: req.body.imgUrl
     };
     productsList.push(product);  
-    res.send(productsList);
+    res.render('main', {formExist: formShow });
  });
 
 products.put('/:id', (req, res) => {
@@ -85,7 +95,6 @@ app.set('view engine', 'hbs');
 app.set('views', './views');
 
 app.use('/products', products);
-app.use('/static', express.static('public'));
 
 app.set('view engine', 'hbs');
 app.set('views', './views');
