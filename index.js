@@ -25,29 +25,20 @@ const productsList = [{
    img: 'https://cdn1.iconfinder.com/data/icons/space-flat-galaxy-radio/512/starship-256.png',
 }];
 
-const listShow = true;
-const formShow = true;
 
 
 products.get('/', (req, res) => {
    if(productsList.length === 0){
       res.send(` Aún no hay productos cargados`)
-   } else {res.render('main', {productsList:productsList, listExist: listShow })}
+   } else {res.render('products', {productsList: productsList})}
    ;
 });
 
-products.get('/:id', (req, res) => {
-   const { id } = req.params;
-   const found = productsList.find(product => product.id === id);
-
-   if(found){
-      res.send(found);
-   }else {
-      res.send('El producto no existe');
-   };
+products.get('/form', (req, res) => {
+   res.render('form');
 });
 
-products.post('/', (req, res) => {
+app.post('/form', (req, res) => {
    const generateNewId = () =>{
       let idIndex = Math.floor(Math.random() * 9999) +1;
       if (Object.keys(productsList).includes(idIndex) == idIndex) {
@@ -62,42 +53,15 @@ products.post('/', (req, res) => {
          img: req.body.imgUrl
     };
     productsList.push(product);  
-    res.render('main', {formExist: formShow });
+    res.send(productsList);
+    console.log(productsList)
  });
 
-products.put('/:id', (req, res) => {
-   const { id } = req.params;
-   const changes = req.body;
-
-   const index = productsList.findIndex(product => product.id === id)
-   
-   if( index !== -1) {
-      productsList[index] = changes;
-      res.send(productsList[index]);
-   }else {
-      res.send('No existe producto con ese ID')
-   };
- });
-
-products.delete('/:id', (req, res) => {
-
-  const { id } = req.params;
-  const deleted = productsList.find(product => product.id === id);
-  if(deleted){
-     productsList = productsList.filter(product => product.id === id);
-     res.send(`Se ha eliminado correctamente el siguiente producto: ${deleted}`)
-  } else {
-     res.send('El id ingresado no coincide con ningún producto');
-  };
- });
 
 app.set('view engine', 'hbs');
 app.set('views', './views');
 
 app.use('/products', products);
-
-app.set('view engine', 'hbs');
-app.set('views', './views');
 
 app.listen(port, () => {
    console.log(`Escuchando en esta uri http://localhost: ${port}`)
